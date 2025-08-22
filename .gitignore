@@ -1,0 +1,15 @@
+# Logs
+*.log
+
+# ASP/IIS
+*.ldb
+*.ldf
+*.mdf
+
+# IDEs
+.vscode/
+.idea/
+
+# SO
+.DS_Store
+Thumbs.db

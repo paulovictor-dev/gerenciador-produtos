@@ -1,0 +1,136 @@
+{
+  "info": {
+    "name": "GerenciadorProdutos",
+    "_postman_id": "7a2f3b2d-aaaa-bbbb-cccc-ffffffffffff",
+    "description": "Coleção de rotas (internas e externas) do projeto",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Auth - Registro",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "url": { "raw": "{{baseUrl}}/backend/registro.asp", "host": ["{{baseUrl}}"], "path": ["backend","registro.asp"] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "nome", "value": "Admin", "type": "text" },
+          { "key": "email", "value": "admin@local", "type": "text" },
+          { "key": "senha", "value": "admin", "type": "text" }
+        ] }
+      }
+    },
+    {
+      "name": "Auth - Login",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "url": { "raw": "{{baseUrl}}/backend/login.asp", "host": ["{{baseUrl}}"], "path": ["backend","login.asp"] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "email", "value": "admin@local", "type": "text" },
+          { "key": "senha", "value": "admin", "type": "text" }
+        ] }
+      }
+    },
+    {
+      "name": "Auth - CheckLogin",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/backend/api/checkLogin.asp", "host": ["{{baseUrl}}"], "path": ["backend","api","checkLogin.asp"] } }
+    },
+    {
+      "name": "Auth - Logout",
+      "request": { "method": "GET", "url": { "raw": "{{baseUrl}}/backend/logout.asp", "host": ["{{baseUrl}}"], "path": ["backend","logout.asp"] } }
+    },
+    {
+      "name": "Produtos - Read (lista)",
+      "request": {
+        "method": "GET",
+        "url": {
+          "raw": "{{baseUrl}}/backend/api/produtos.asp?action=read&q=&pagina=1&tamanho=10",
+          "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"],
+          "query": [
+            { "key": "action", "value": "read" },
+            { "key": "q", "value": "" },
+            { "key": "pagina", "value": "1" },
+            { "key": "tamanho", "value": "10" }
+          ]
+        }
+      }
+    },
+    {
+      "name": "Produtos - Create",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=create", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "create" }] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "nome", "value": "produto postman", "type": "text" },
+          { "key": "preco", "value": "77.90", "type": "text" }
+        ] }
+      }
+    },
+    {
+      "name": "Produtos - Update",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=update", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "update" }] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "id", "value": "1", "type": "text" },
+          { "key": "nome", "value": "produto alterado", "type": "text" },
+          { "key": "preco", "value": "88.50", "type": "text" }
+        ] }
+      }
+    },
+    {
+      "name": "Produtos - Delete",
+      "request": {
+        "method": "POST",
+        "header": [{ "key": "Content-Type", "value": "application/x-www-form-urlencoded" }],
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=delete", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "delete" }] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "id", "value": "1", "type": "text" }
+        ] }
+      }
+    },
+    {
+      "name": "Produtos - Histórico (logs)",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=history", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "history" }] }
+      }
+    },
+    {
+      "name": "Externos - Gerar Token",
+      "request": {
+        "method": "GET",
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=external_token", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "external_token" }] }
+      }
+    },
+    {
+      "name": "Externos - Listar (Bearer)",
+      "request": {
+        "method": "GET",
+        "header": [{ "key": "Authorization", "value": "Bearer {{token}}" }],
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=external_list", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "external_list" }] }
+      }
+    },
+    {
+      "name": "Externos - Criar (Bearer)",
+      "request": {
+        "method": "POST",
+        "header": [
+          { "key": "Authorization", "value": "Bearer {{token}}" },
+          { "key": "Content-Type", "value": "application/x-www-form-urlencoded" }
+        ],
+        "url": { "raw": "{{baseUrl}}/backend/api/produtos.asp?action=external_create", "host": ["{{baseUrl}}"], "path": ["backend","api","produtos.asp"], "query": [{ "key": "action", "value": "external_create" }] },
+        "body": { "mode": "urlencoded", "urlencoded": [
+          { "key": "nome", "value": "Produto externo Postman", "type": "text" },
+          { "key": "preco", "value": "59.90", "type": "text" }
+        ] }
+      }
+    }
+  ],
+  "variable": [
+    { "key": "baseUrl", "value": "http://localhost/GerenciadorProdutos" },
+    { "key": "token",   "value": "" }
+  ]
+}

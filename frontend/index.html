@@ -1,0 +1,372 @@
+<!doctype html>
+<html lang="pt-br">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Produtos • App</title>
+  <script>
+    (async () => {
+      try {
+        const r = await fetch("/GerenciadorProdutos/backend/checkLogin.asp");
+        const j = await r.json();
+        if (!j.logado) {
+          window.location.href = "login.html";
+        }
+      } catch(e) {
+        window.location.href = "login.html";
+      }
+    })();
+  </script>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+  <style>
+    .view { min-height: 65vh; }
+  </style>
+</head>
+
+<body>
+  <nav class="navbar navbar-expand-lg bg-body-tertiary border-bottom">
+    <div class="container">
+      <a class="navbar-brand" href="#/list">Gerenciador de Produtos</a>
+      <div class="ms-auto">
+        <!-- <a class="btn btn-outline-secondary btn-sm" href="./login.html">Sair</a> -->
+        <button id="btn-sair" class="btn btn-outline-secondary btn-sm">Sair</button>
+      </div>
+    </div>
+  </nav>
+
+  <main class="container py-4">
+    <!-- LIST -->
+    <section id="view-list" class="view">
+      <div class="d-flex justify-content-between align-items-center mb-3">
+        <h1 class="h4 m-0">Produtos</h1>
+        <div>
+            <a class="btn btn-primary" href="#/create">+ Incluir</a>
+            <button id="btn-historico" class="btn btn-secondary"><span class="bi bi-clock-history"> Histórico </span></button>
+        </div>
+      </div>
+
+      <form id="filterForm" class="row g-2 align-items-end mb-3">
+        <div class="col-12 col-md-4">
+          <label class="form-label">Busca</label>
+          <input type="text" id="nomeProd" class="form-control" placeholder="Nome do produto" />
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Preço mín.</label>
+          <input type="number" step="0.01" id="min" class="form-control" />
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Preço máx.</label>
+          <input type="number" step="0.01" id="max" class="form-control" />
+        </div>
+        <!-- <div class="col-6 col-md-2">
+          <label class="form-label">Ordenar</label>
+          <select id="sort" class="form-select">
+            <option value="Nome">Nome</option>
+            <option value="Preco">Preço</option>
+          </select>
+        </div>
+        <div class="col-6 col-md-2">
+          <label class="form-label">Direção</label>
+          <select id="dir" class="form-select">
+            <option value="ASC">ASC</option>
+            <option value="DESC">DESC</option>
+          </select>
+        </div> -->
+        <div class="col-12 col-md-2">
+          <button class="btn btn-outline-primary w-100" type="submit">Filtrar</button>
+        </div>
+      </form>
+
+      <div class="table-responsive">
+        <table class="table table-hover align-middle" id="tbl">
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Nome</th>
+              <th class="text-end">Preço (R$)</th>
+              <th class="text-end">Ações</th>
+            </tr>
+          </thead>
+          <tbody></tbody>
+        </table>
+      </div>
+    </section>
+
+    <!-- CRIAR -->
+    <section id="view-create" class="view d-none">
+      <h1 class="h4 mb-3">Adicionar produto</h1>
+      <form id="createForm" class="card p-3 shadow-sm">
+        <div class="mb-3">
+          <label class="form-label">Nome</label>
+          <input type="text" name="nome" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Preço (R$)</label>
+          <input type="number" step="0.01" name="preco" class="form-control" required />
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Salvar</button>
+          <a class="btn btn-light" href="#/list">Cancelar</a>
+        </div>
+      </form>
+    </section>
+
+    <!-- EDITAR -->
+    <section id="view-edit" class="view d-none">
+      <h1 class="h4 mb-3">Editar produto</h1>
+      <form id="editForm" class="card p-3 shadow-sm">
+        <input type="hidden" name="id" />
+        <div class="mb-3">
+          <label class="form-label">Nome</label>
+          <input type="text" name="nome" class="form-control" required />
+        </div>
+        <div class="mb-3">
+          <label class="form-label">Preço (R$)</label>
+          <input type="number" step="0.01" name="preco" class="form-control" required />
+        </div>
+        <div class="d-flex gap-2">
+          <button class="btn btn-primary" type="submit">Atualizar</button>
+          <a class="btn btn-light" href="#/list">Cancelar</a>
+        </div>
+      </form>
+    </section>
+
+    <hr class="my-4" />
+    <details>
+      <summary><strong>APIs externas (Bearer)</strong></summary>
+      <div class="row g-2 mt-2">
+        <div class="col-12 col-md-6">
+          <label class="form-label">Bearer token</label>
+          <input id="extToken" class="form-control" placeholder="cole o token aqui" />
+        </div>
+        <div class="col-12 d-flex gap-2 mt-2">
+          <button id="btnExtToken" class="btn btn-outline-secondary btn-sm">Gerar token (12h)</button>
+          <button id="btnExtList" class="btn btn-outline-primary btn-sm">Listar (external_list)</button>
+          <button id="btnExtCreate" class="btn btn-outline-success btn-sm">Criar Externo (external_create)</button>
+        </div>
+        <pre id="extResult" class="mt-3 p-3 bg-light border rounded small" style="max-height: 260px; overflow:auto;"></pre>
+      </div>
+    </details>
+
+    <div class="modal fade" id="historicoModal" tabindex="-1" aria-labelledby="historicoLabel" aria-hidden="true">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="historicoLabel">Histórico de Alterações</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+            </div>
+            <div class="modal-body">
+                <table class="table table-sm table-bordered">
+                <thead class="table-light">
+                    <tr>
+                    <th>ID Produto</th>
+                    <th>Operação</th>
+                    <th>Nome Antigo</th>
+                    <th>Preço Antigo</th>
+                    <th>Nome Novo</th>
+                    <th>Preço Novo</th>
+                    <th>Usuário</th>
+                    <th>Data</th>
+                    </tr>
+                </thead>
+                <tbody id="tblHistorico"></tbody>
+                </table>
+            </div>
+            </div>
+        </div>
+        </div>
+  </main>
+
+  <script src="https://code.jquery.com/jquery-3.7.1.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+
+  <!-- API helpers -->
+  <!-- cole aqui o conteúdo do js/api.js OU inclua como arquivo -->
+  <script src="./js/api.js"></script>
+
+  <script>
+  // ======= app.js (lógica da página) =======
+  const state = { cache: [], nomeProd: "", min: "", max: "" };
+
+  function moneyBR(v){ const n = Number(v); return Number.isNaN(n) ? v : n.toFixed(2).replace(".", ","); }
+  function showView(id){ document.querySelectorAll(".view").forEach(v=>v.classList.add("d-none")); document.getElementById(id).classList.remove("d-none"); }
+  async function loadList(){
+    const params = {
+      nomeProd: state.nomeProd || undefined,
+      min: state.min || undefined,
+      max: state.max || undefined
+    };
+
+    try {
+      const resp = await apiConsultarProdutos(params); 
+      let list = [];
+      if (Array.isArray(resp.data)) list = resp.data;
+      else if (Array.isArray(resp.produtos)) list = resp.produtos.map(x=>({ id:x.id??x.Id, nome:x.nome??x.Nome, preco:x.preco??x.Preco }));
+      else if (Array.isArray(resp)) list = resp;
+      state.cache = list;
+      const tb = document.querySelector("#tbl tbody");
+      tb.innerHTML = list.map(p => `
+        <tr>
+          <td>${p.id}</td>
+          <td>${p.nome}</td>
+          <td class="text-end">${moneyBR(p.preco)}</td>
+          <td class="text-end">
+            <a class="btn btn-sm btn-outline-primary me-2" href="#/edit/${p.id}"><span class="bi bi-pencil-square"> Editar</span></a>
+            <button data-id="${p.id}" data-nome="${p.nome}" class="btn btn-sm btn-outline-danger btn-del"><span class="bi bi-trash"> Excluir</span></button>
+          </td>
+        </tr>`).join("");
+
+      document.querySelectorAll(".btn-del").forEach(btn=>{
+        btn.addEventListener("click", async (e)=>{
+          const id = e.currentTarget.getAttribute("data-id");
+          const nome = e.currentTarget.getAttribute("data-nome");
+          if (!confirm("Confirma excluir o produto " + id + " - " + nome + "?")) return;
+          const r = await apiExcluirProdutos(id);
+          if (r.status === "sucesso") loadList(); else alert(r.mensagem || "Erro ao excluir.");
+        });
+      });
+    } catch(e) {
+        const lastErr = (e && e.responseText) ? e : null;
+        let msg = "Falha ao carregar produtos.";
+        if (lastErr && lastErr.status) msg += ` (HTTP ${lastErr.status})`;
+        alert(msg + " Verifique se está logado e se a URL do backend está correta.");
+
+        // se for 401, voltar pro login
+        if (lastErr && lastErr.status === 401) {
+            window.location.href = "./login.html";
+            return;
+        }
+    //   alert("Falha ao carregar produtos. Faça login novamente.");
+    //   window.location.href = "./login.html";
+    }
+  }
+
+  function navigate(){
+    const hash = window.location.hash || "#/list";
+    const [_, route, param] = hash.split("/");
+    if (route === "list"){ showView("view-list"); loadList(); }
+    else if (route === "create"){ showView("view-create"); document.getElementById("createForm").reset(); }
+    else if (route === "edit"){
+      showView("view-edit");
+      const p = state.cache.find(x => String(x.id) === String(param));
+      const f = document.getElementById("editForm");
+      if (p){ f.id.value = p.id; f.nome.value = p.nome; f.preco.value = (p.preco??"").toString().replace(",", "."); }
+      else { loadList(); }
+    } else { window.location.hash = "#/list"; }
+  }
+
+  // filtros
+  document.getElementById("filterForm").addEventListener("submit", (e)=>{
+    e.preventDefault();
+    state.nomeProd = document.getElementById("nomeProd").value.trim();
+    state.min = document.getElementById("min").value.trim();
+    state.max = document.getElementById("max").value.trim();
+    if (Number(state.min) > Number(state.max)) {
+        alert("Preço mínimo não pode ser maior que o preço máximo.");
+        return
+    }
+    loadList();
+  });
+
+  // criar
+  document.getElementById("createForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+    const r = await apiCriarProdutos(data);
+    if (r.status === "sucesso"){ window.location.hash = "#/list"; loadList(); }
+    else alert(r.mensagem || "Erro ao criar.");
+  });
+
+  // editar
+  document.getElementById("editForm").addEventListener("submit", async (e)=>{
+    e.preventDefault();
+    const data = Object.fromEntries(new FormData(e.currentTarget).entries());
+    const r = await apiAlterarProdutos(data);
+    if (r.status === "sucesso"){ window.location.hash = "#/list"; loadList(); }
+    else alert(r.mensagem || "Erro ao atualizar.");
+  });
+
+  // externas
+  const saved = localStorage.getItem("external_token");
+  if (saved) document.getElementById("extToken").value = saved;
+
+  document.getElementById("btnExtToken").addEventListener("click", async ()=>{
+    try {
+      const txt = await $.ajax({
+        url: API_PRODUTOS,
+        method: "GET",
+        data: { action: "external_token" },
+        dataType: "text"
+      });
+
+      let r;
+      try {
+        r = JSON.parse(txt);
+      } catch (e) {
+        console.error("Parse do external_token falhou. Resposta crua:", txt);
+        throw e;
+      }
+
+      if (r && r.status === "sucesso" && r.token) {
+        document.getElementById("extToken").value = r.token;
+        localStorage.setItem("external_token", r.token);
+        document.getElementById("extResult").textContent = JSON.stringify(r, null, 2);
+      } else {
+        document.getElementById("extResult").textContent = "Falha ao gerar token.";
+      }
+    } catch(e) {
+      document.getElementById("extResult").textContent = "Erro ao gerar token (verifique se está logado).";
+      console.error(e);
+    }
+});
+
+  document.getElementById("btnExtList").addEventListener("click", async ()=>{
+    const t = document.getElementById("extToken").value.trim();
+    if (!t) return alert("Cole um Bearer token.");
+    try { const r = await apiExternalList(t); document.getElementById("extResult").textContent = JSON.stringify(r, null, 2); }
+    catch { document.getElementById("extResult").textContent = "Falha ao listar externo."; }
+  });
+
+  document.getElementById("btnExtCreate").addEventListener("click", async ()=>{
+    const t = document.getElementById("extToken").value.trim();
+    if (!t) return alert("Cole um Bearer token.");
+    const nome = prompt("Nome do produto externo:"); if (!nome) return;
+    const preco = prompt("Preço (ex: 79.90):"); if (!preco) return;
+    try { const r = await apiExternalCreate(t, { nome, preco }); document.getElementById("extResult").textContent = JSON.stringify(r, null, 2); }
+    catch { document.getElementById("extResult").textContent = "Falha ao criar externo."; }
+  });
+
+  document.getElementById("btn-historico").addEventListener("click", async () => {
+    try {
+        const dados = await apiConsultarHistorico();
+        const tb = document.getElementById("tblHistorico");
+        tb.innerHTML = dados.map(h => `
+        <tr>
+            <td>${h.produtoId}</td>
+            <td>${h.operacao}</td>
+            <td>${h.nomeAntigo ?? ""}</td>
+            <td class="text-end">R$ ${h.precoAntigo ?? ""}</td>
+            <td>${h.nomeNovo ?? ""}</td>
+            <td class="text-end">R$ ${h.precoNovo ?? ""}</td>
+            <td>${h.usuarioLogin}</td>
+            <td>${h.dataLog}</td>
+        </tr>`).join("");
+        const modal = new bootstrap.Modal(document.getElementById("historicoModal"));
+        modal.show();
+    } catch(e) {
+        alert("Erro ao carregar histórico");
+        console.error(e);
+    }
+});
+
+document.getElementById("btn-sair").addEventListener("click", async () => {
+    await fetch("/GerenciadorProdutos/backend/logout.asp");
+    window.location.href = "login.html";
+});
+
+  window.addEventListener("hashchange", navigate);
+  window.addEventListener("DOMContentLoaded", navigate);
+  </script>
+</body>
+</html>
